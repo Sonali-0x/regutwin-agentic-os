@@ -8,8 +8,8 @@ desktop.ini
 # ==========================================
 # IDEs & Editors
 # ==========================================
-.vscode/
 .idea/
+.vscode/
 *.swp
 *.swo
 
@@ -22,49 +22,54 @@ desktop.ini
 !.env.template
 
 # ==========================================
-# Python (Backend + AI)
+# Python (Global)
 # ==========================================
-**/__pycache__/
-**/*.py[cod]
-**/.pytest_cache/
-**/.mypy_cache/
-**/.ruff_cache/
-**/.coverage
-**/htmlcov/
+__pycache__/
+*.py[cod]
+*$py.class
 
 # Virtual Environments
 .venv/
 venv/
 env/
 ENV/
-**/.venv/
-**/venv/
+
+# Python Tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.pyre/
+.tox/
+.nox/
+
+# Coverage
+.coverage
+htmlcov/
+coverage/
 
 # Build Artifacts
-**/build/
-**/dist/
-**/*.egg-info/
+build/
+dist/
+*.egg-info/
+.eggs/
 
 # Jupyter
-**/.ipynb_checkpoints/
+.ipynb_checkpoints/
 
 # ==========================================
-# AI / ML
+# AI
 # ==========================================
-
-# Models
+ai/venv/
+ai/.venv/
 ai/models/
 ai/checkpoints/
 ai/weights/
+ai/outputs/
+ai/generated/
+ai/artifacts/
+ai/cache/
 
-*.pt
-*.pth
-*.ckpt
-*.bin
-*.onnx
-*.safetensors
-
-# Vector Stores
+# Vector Databases
 ai/chroma/
 ai/chromadb/
 ai/vector_store/
@@ -72,40 +77,24 @@ ai/vectordb/
 ai/faiss_index/
 ai/storage/
 
-# LangGraph / LangChain
+# LangGraph
 ai/.langgraph/
 ai/state/
 ai/memory/
 
-# Generated Outputs
-ai/outputs/
-ai/generated/
-ai/artifacts/
+# Model Files
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.safetensors
+*.h5
 
 # Databases
-*.sqlite3
 *.db
-
-# Logs
-logs/
-*.log
-
-# ==========================================
-# Node.js / Frontend
-# ==========================================
-frontend/node_modules/
-frontend/.next/
-frontend/out/
-frontend/build/
-frontend/dist/
-frontend/.turbo/
-frontend/.cache/
-
-# Package Manager
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
-frontend/pnpm-debug.log*
+*.sqlite
+*.sqlite3
 
 # ==========================================
 # Backend
@@ -116,17 +105,33 @@ backend/tmp/
 backend/temp/
 
 # ==========================================
+# Frontend (Node.js / Next.js)
+# ==========================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.cache/
+frontend/.turbo/
+
+# Package Manager Logs
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ==========================================
 # Docker
 # ==========================================
 docker-compose.override.yml
 *.pid
 
 # ==========================================
-# Testing
+# Logs
 # ==========================================
-coverage/
-test-results/
-playwright-report/
+logs/
+*.log
 
 # ==========================================
 # Secrets
@@ -138,8 +143,8 @@ service-account.json
 *.key
 
 # ==========================================
-# Misc
+# Temporary Files
 # ==========================================
-*.bak
 *.tmp
 *.temp
+*.bak
