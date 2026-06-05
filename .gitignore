@@ -1,0 +1,145 @@
+# ==========================================
+# OS Files
+# ==========================================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ==========================================
+# IDEs & Editors
+# ==========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# ==========================================
+# Environment Variables
+# ==========================================
+.env
+.env.*
+!.env.example
+!.env.template
+
+# ==========================================
+# Python (Backend + AI)
+# ==========================================
+**/__pycache__/
+**/*.py[cod]
+**/.pytest_cache/
+**/.mypy_cache/
+**/.ruff_cache/
+**/.coverage
+**/htmlcov/
+
+# Virtual Environments
+.venv/
+venv/
+env/
+ENV/
+**/.venv/
+**/venv/
+
+# Build Artifacts
+**/build/
+**/dist/
+**/*.egg-info/
+
+# Jupyter
+**/.ipynb_checkpoints/
+
+# ==========================================
+# AI / ML
+# ==========================================
+
+# Models
+ai/models/
+ai/checkpoints/
+ai/weights/
+
+*.pt
+*.pth
+*.ckpt
+*.bin
+*.onnx
+*.safetensors
+
+# Vector Stores
+ai/chroma/
+ai/chromadb/
+ai/vector_store/
+ai/vectordb/
+ai/faiss_index/
+ai/storage/
+
+# LangGraph / LangChain
+ai/.langgraph/
+ai/state/
+ai/memory/
+
+# Generated Outputs
+ai/outputs/
+ai/generated/
+ai/artifacts/
+
+# Databases
+*.sqlite3
+*.db
+
+# Logs
+logs/
+*.log
+
+# ==========================================
+# Node.js / Frontend
+# ==========================================
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/.turbo/
+frontend/.cache/
+
+# Package Manager
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/pnpm-debug.log*
+
+# ==========================================
+# Backend
+# ==========================================
+backend/logs/
+backend/uploads/
+backend/tmp/
+backend/temp/
+
+# ==========================================
+# Docker
+# ==========================================
+docker-compose.override.yml
+*.pid
+
+# ==========================================
+# Testing
+# ==========================================
+coverage/
+test-results/
+playwright-report/
+
+# ==========================================
+# Secrets
+# ==========================================
+secrets/
+credentials.json
+service-account.json
+*.pem
+*.key
+
+# ==========================================
+# Misc
+# ==========================================
+*.bak
+*.tmp
+*.temp
