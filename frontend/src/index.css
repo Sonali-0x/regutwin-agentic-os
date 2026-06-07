@@ -1,50 +1,48 @@
-@import "tailwindcss";
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+@import "tailwindcss";
 
 /* ============================================
    ReguTwin Agentic OS — Design System
+   Light Theme · Purple Accent
    ============================================ */
 
 @theme {
-  /* Brand Colors */
-  --color-primary-50: #eff6ff;
-  --color-primary-100: #dbeafe;
-  --color-primary-200: #bfdbfe;
-  --color-primary-300: #93c5fd;
-  --color-primary-400: #60a5fa;
-  --color-primary-500: #3b82f6;
-  --color-primary-600: #2563eb;
-  --color-primary-700: #1d4ed8;
-  --color-primary-800: #1e40af;
-  --color-primary-900: #1e3a8a;
+  /* Purple Accent Palette */
+  --color-accent-50: #f5f3ff;
+  --color-accent-100: #ede9fe;
+  --color-accent-200: #ddd6fe;
+  --color-accent-300: #c4b5fd;
+  --color-accent-400: #a78bfa;
+  --color-accent-500: #8b5cf6;
+  --color-accent-600: #7c3aed;
+  --color-accent-700: #6d28d9;
+  --color-accent-800: #5b21b6;
+  --color-accent-900: #4c1d95;
 
-  --color-secondary-500: #6366f1;
-  --color-secondary-600: #4f46e5;
-  --color-secondary-700: #4338ca;
+  /* Indigo Supporting */
+  --color-indigo-500: #6366f1;
+  --color-indigo-600: #4f46e5;
 
-  /* Status Colors */
-  --color-success-500: #22c55e;
-  --color-success-600: #16a34a;
-  --color-warning-500: #f59e0b;
-  --color-warning-600: #d97706;
-  --color-danger-500: #ef4444;
-  --color-danger-600: #dc2626;
+  /* Neutral Palette */
+  --color-gray-50: #f9fafb;
+  --color-gray-100: #f3f4f6;
+  --color-gray-200: #e5e7eb;
+  --color-gray-300: #d1d5db;
+  --color-gray-400: #9ca3af;
+  --color-gray-500: #6b7280;
+  --color-gray-600: #4b5563;
+  --color-gray-700: #374151;
+  --color-gray-800: #1f2937;
+  --color-gray-900: #111827;
 
-  /* Dark Surface Palette */
-  --color-surface-950: #0a0e1a;
-  --color-surface-900: #0f1629;
-  --color-surface-800: #151d35;
-  --color-surface-700: #1c2642;
-  --color-surface-600: #243050;
-  --color-surface-500: #2d3a5e;
-  --color-surface-400: #3d4f7a;
-  --color-surface-300: #5a6d96;
-  --color-surface-200: #8494b8;
-  --color-surface-100: #b0bdd6;
+  /* Status */
+  --color-success: #22c55e;
+  --color-warning: #f59e0b;
+  --color-danger: #ef4444;
 }
 
 /* ============================================
-   Global Reset & Base
+   Global Base
    ============================================ */
 *,
 *::before,
@@ -62,232 +60,499 @@ html {
 
 body {
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  background-color: var(--color-surface-950);
-  color: #e2e8f0;
+  background-color: #f8f9fc;
+  color: var(--color-gray-800);
   min-height: 100vh;
   line-height: 1.6;
 }
 
 /* ============================================
-   Glass Morphism Utilities
+   Auth Split Layout
    ============================================ */
-.glass {
-  background: rgba(15, 22, 41, 0.6);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(59, 130, 246, 0.08);
+.auth-container {
+  display: flex;
+  min-height: 100vh;
+  background: #fff;
 }
 
-.glass-card {
-  background: rgba(21, 29, 53, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(59, 130, 246, 0.1);
-  border-radius: 16px;
+.auth-gradient-panel {
+  position: relative;
+  flex: 0 0 42%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 48px;
+  border-radius: 0 32px 32px 0;
 }
 
-.glass-input {
-  background: rgba(15, 22, 41, 0.5);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
-  border: 1px solid rgba(59, 130, 246, 0.15);
-  border-radius: 12px;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.glass-input:focus {
-  border-color: var(--color-primary-500);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15), 0 0 20px rgba(59, 130, 246, 0.1);
-  outline: none;
-}
-
-/* ============================================
-   Animated Gradient Background
-   ============================================ */
-.gradient-bg {
+.auth-gradient-bg {
+  position: absolute;
+  inset: 0;
   background: 
-    radial-gradient(ellipse 80% 50% at 20% 40%, rgba(37, 99, 235, 0.12) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 40% at 80% 60%, rgba(99, 102, 241, 0.08) 0%, transparent 60%),
-    radial-gradient(ellipse 40% 30% at 50% 80%, rgba(34, 197, 94, 0.04) 0%, transparent 60%),
-    var(--color-surface-950);
+    radial-gradient(ellipse 120% 80% at 30% 50%, rgba(139, 92, 246, 0.9) 0%, transparent 60%),
+    radial-gradient(ellipse 100% 100% at 70% 30%, rgba(124, 58, 237, 0.7) 0%, transparent 50%),
+    radial-gradient(ellipse 80% 80% at 50% 80%, rgba(99, 102, 241, 0.6) 0%, transparent 50%),
+    radial-gradient(ellipse 60% 60% at 20% 20%, rgba(167, 139, 250, 0.8) 0%, transparent 50%),
+    linear-gradient(135deg, #8b5cf6 0%, #6366f1 50%, #a78bfa 100%);
+  z-index: 0;
 }
 
-/* ============================================
-   Grid Pattern Overlay
-   ============================================ */
-.grid-pattern {
-  background-image: 
-    linear-gradient(rgba(59, 130, 246, 0.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(59, 130, 246, 0.03) 1px, transparent 1px);
-  background-size: 64px 64px;
-}
-
-/* ============================================
-   Floating Orbs (decorative)
-   ============================================ */
-.orb {
+/* Animated mesh blobs */
+.auth-blob {
   position: absolute;
   border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.4;
-  animation: float 8s ease-in-out infinite;
-  pointer-events: none;
+  filter: blur(60px);
+  opacity: 0.6;
+  animation: blobFloat 10s ease-in-out infinite;
+  z-index: 1;
 }
 
-.orb-blue {
-  background: var(--color-primary-600);
-  width: 300px;
-  height: 300px;
+.auth-blob-1 {
+  width: 320px;
+  height: 320px;
+  background: rgba(196, 181, 253, 0.7);
+  top: 10%;
+  left: 10%;
 }
 
-.orb-indigo {
-  background: var(--color-secondary-600);
-  width: 250px;
-  height: 250px;
+.auth-blob-2 {
+  width: 280px;
+  height: 280px;
+  background: rgba(99, 102, 241, 0.5);
+  top: 40%;
+  right: -10%;
   animation-delay: -3s;
-  animation-duration: 10s;
-}
-
-.orb-green {
-  background: var(--color-success-600);
-  width: 200px;
-  height: 200px;
-  animation-delay: -5s;
   animation-duration: 12s;
 }
 
-@keyframes float {
+.auth-blob-3 {
+  width: 200px;
+  height: 200px;
+  background: rgba(255, 255, 255, 0.15);
+  bottom: 20%;
+  left: 30%;
+  animation-delay: -6s;
+  animation-duration: 14s;
+}
+
+@keyframes blobFloat {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -20px) scale(1.05); }
-  66% { transform: translate(-20px, 15px) scale(0.95); }
+  33% { transform: translate(20px, -15px) scale(1.05); }
+  66% { transform: translate(-15px, 10px) scale(0.95); }
+}
+
+.auth-panel-content {
+  position: relative;
+  z-index: 2;
+}
+
+.auth-form-panel {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+}
+
+.auth-form-wrapper {
+  width: 100%;
+  max-width: 420px;
 }
 
 /* ============================================
-   Button Styles
+   Brand Asterisk Icon
+   ============================================ */
+.brand-icon {
+  width: 36px;
+  height: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--color-accent-600);
+  line-height: 1;
+}
+
+.brand-icon-white {
+  color: #fff;
+  font-size: 32px;
+}
+
+/* ============================================
+   Form Inputs
+   ============================================ */
+.form-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gray-700);
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  color: var(--color-gray-800);
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: 12px;
+  outline: none;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.form-input::placeholder {
+  color: var(--color-gray-400);
+}
+
+.form-input:focus {
+  border-color: var(--color-accent-500);
+  box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.1);
+}
+
+.form-input-icon {
+  padding-left: 44px;
+}
+
+.form-select {
+  appearance: none;
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%239ca3af' stroke-width='2'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' d='m19.5 8.25-7.5 7.5-7.5-7.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 16px;
+  padding-right: 40px;
+}
+
+/* ============================================
+   Buttons
    ============================================ */
 .btn-primary {
-  background: linear-gradient(135deg, var(--color-primary-600), var(--color-secondary-600));
-  color: white;
+  width: 100%;
+  padding: 13px 24px;
+  font-size: 15px;
   font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--color-accent-600), var(--color-indigo-600));
   border: none;
   border-radius: 12px;
-  padding: 14px 28px;
-  font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
+  transition: all 0.25s ease;
+  font-family: inherit;
   letter-spacing: 0.01em;
 }
 
-.btn-primary::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, var(--color-primary-500), var(--color-secondary-500));
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-
-.btn-primary:hover::before {
-  opacity: 1;
-}
-
 .btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(37, 99, 235, 0.35), 0 4px 12px rgba(79, 70, 229, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(124, 58, 237, 0.3);
 }
 
 .btn-primary:active {
   transform: translateY(0);
 }
 
-.btn-primary span {
-  position: relative;
-  z-index: 1;
+.btn-primary:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
-  background: transparent;
-  color: var(--color-primary-400);
+  padding: 12px 24px;
+  font-size: 14px;
   font-weight: 500;
-  border: 1px solid rgba(59, 130, 246, 0.2);
+  color: var(--color-gray-600);
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
   border-radius: 12px;
-  padding: 14px 28px;
-  font-size: 15px;
   cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: all 0.2s ease;
+  font-family: inherit;
 }
 
 .btn-secondary:hover {
-  background: rgba(59, 130, 246, 0.08);
-  border-color: rgba(59, 130, 246, 0.3);
+  border-color: var(--color-gray-300);
+  background: var(--color-gray-50);
 }
 
-/* ============================================
-   Shimmer / Pulse animations
-   ============================================ */
-@keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.shimmer-line {
-  background: linear-gradient(90deg, transparent 25%, rgba(59, 130, 246, 0.06) 50%, transparent 75%);
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
-}
-
-@keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(59, 130, 246, 0.2); }
-  50% { box-shadow: 0 0 0 8px rgba(59, 130, 246, 0); }
-}
-
-.pulse-glow {
-  animation: pulse-glow 2s ease-in-out infinite;
-}
-
-/* ============================================
-   Fade In Animation
-   ============================================ */
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-.fade-in {
-  animation: fadeIn 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
-}
-
-.fade-in-delay-1 { animation-delay: 0.1s; opacity: 0; }
-.fade-in-delay-2 { animation-delay: 0.2s; opacity: 0; }
-.fade-in-delay-3 { animation-delay: 0.3s; opacity: 0; }
-.fade-in-delay-4 { animation-delay: 0.4s; opacity: 0; }
-
-/* ============================================
-   Upload Drop Zone
-   ============================================ */
-.drop-zone {
-  border: 2px dashed rgba(59, 130, 246, 0.2);
-  border-radius: 16px;
-  background: rgba(15, 22, 41, 0.3);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+/* Social buttons */
+.social-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gray-700);
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: 12px;
   cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+}
+
+.social-btn:hover {
+  border-color: var(--color-accent-300);
+  background: var(--color-accent-50);
+}
+
+/* ============================================
+   Divider with text
+   ============================================ */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-gray-200);
+}
+
+.divider-text {
+  font-size: 13px;
+  color: var(--color-gray-400);
+  white-space: nowrap;
+}
+
+/* ============================================
+   Upload Card Design
+   ============================================ */
+.upload-card {
+  background: #fff;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 8px 24px rgba(0, 0, 0, 0.04);
+  padding: 32px;
+}
+
+.drop-zone {
+  border: 2px dashed var(--color-gray-300);
+  border-radius: 16px;
+  padding: 40px 24px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  background: var(--color-gray-50);
 }
 
 .drop-zone:hover,
 .drop-zone.drag-over {
-  border-color: var(--color-primary-500);
-  background: rgba(59, 130, 246, 0.05);
-  box-shadow: 0 0 30px rgba(59, 130, 246, 0.08);
+  border-color: var(--color-accent-400);
+  background: var(--color-accent-50);
 }
 
 .drop-zone.drag-over {
   transform: scale(1.01);
 }
 
+.upload-btn-inside {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gray-700);
+  background: #fff;
+  border: 1.5px solid var(--color-gray-200);
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  margin-bottom: 12px;
+}
+
+.upload-btn-inside:hover {
+  border-color: var(--color-accent-400);
+  color: var(--color-accent-600);
+}
+
+/* File item card */
+.file-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  background: var(--color-gray-50);
+  border: 1px solid var(--color-gray-100);
+  border-radius: 14px;
+  transition: all 0.2s ease;
+}
+
+.file-item:hover {
+  background: #fff;
+  border-color: var(--color-gray-200);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.file-icon-box {
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--color-accent-100), var(--color-accent-50));
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+
+.file-icon-box svg {
+  width: 22px;
+  height: 22px;
+  color: var(--color-accent-600);
+}
+
+/* Progress bar */
+.progress-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--color-gray-200);
+  overflow: hidden;
+  margin-top: 8px;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--color-accent-500), var(--color-indigo-500));
+  transition: width 0.4s ease;
+}
+
 /* ============================================
-   Scrollbar
+   Dashboard Layout (Light)
+   ============================================ */
+.sidebar {
+  background: #fff;
+  border-right: 1px solid var(--color-gray-100);
+}
+
+.sidebar-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-gray-500);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.sidebar-link:hover {
+  background: var(--color-gray-50);
+  color: var(--color-gray-700);
+}
+
+.sidebar-link.active {
+  background: var(--color-accent-50);
+  color: var(--color-accent-700);
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.fade-in {
+  animation: fadeIn 0.5s ease forwards;
+}
+
+.fade-in-delay-1 { animation-delay: 0.08s; opacity: 0; }
+.fade-in-delay-2 { animation-delay: 0.16s; opacity: 0; }
+.fade-in-delay-3 { animation-delay: 0.24s; opacity: 0; }
+.fade-in-delay-4 { animation-delay: 0.32s; opacity: 0; }
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-up {
+  animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* ============================================
+   Password Strength Bars
+   ============================================ */
+.strength-bar {
+  height: 4px;
+  flex: 1;
+  border-radius: 2px;
+  background: var(--color-gray-200);
+  transition: background 0.3s ease;
+}
+
+.strength-bar.weak { background: var(--color-danger); }
+.strength-bar.medium { background: var(--color-warning); }
+.strength-bar.strong { background: var(--color-success); }
+
+/* ============================================
+   Error Banner
+   ============================================ */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 12px;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* ============================================
+   Tag badges
+   ============================================ */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 600;
+  border-radius: 6px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.tag-purple {
+  background: var(--color-accent-100);
+  color: var(--color-accent-700);
+}
+
+.tag-green {
+  background: #dcfce7;
+  color: #16a34a;
+}
+
+.tag-blue {
+  background: #dbeafe;
+  color: #2563eb;
+}
+
+.tag-amber {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+/* ============================================
+   Scrollbar (light)
    ============================================ */
 ::-webkit-scrollbar {
   width: 6px;
@@ -298,45 +563,30 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(59, 130, 246, 0.2);
+  background: var(--color-gray-300);
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(59, 130, 246, 0.35);
+  background: var(--color-gray-400);
 }
 
 /* ============================================
-   File Item Progress
+   Responsive: Auth on mobile
    ============================================ */
-@keyframes progress-fill {
-  from { width: 0%; }
-  to { width: 100%; }
-}
+@media (max-width: 768px) {
+  .auth-container {
+    flex-direction: column;
+  }
 
-.progress-bar {
-  height: 4px;
-  border-radius: 2px;
-  background: rgba(59, 130, 246, 0.1);
-  overflow: hidden;
-}
+  .auth-gradient-panel {
+    flex: none;
+    min-height: 200px;
+    border-radius: 0 0 24px 24px;
+    padding: 32px 24px;
+  }
 
-.progress-bar-fill {
-  height: 100%;
-  border-radius: 2px;
-  background: linear-gradient(90deg, var(--color-primary-500), var(--color-success-500));
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-/* ============================================
-   Toast notification
-   ============================================ */
-@keyframes slideInRight {
-  from { transform: translateX(100%); opacity: 0; }
-  to { transform: translateX(0); opacity: 1; }
-}
-
-@keyframes slideOutRight {
-  from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(100%); opacity: 0; }
+  .auth-form-panel {
+    padding: 32px 24px;
+  }
 }
