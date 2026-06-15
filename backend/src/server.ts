@@ -1,7 +1,7 @@
 import app from "./app.js";
 import { connectDB } from "./config/database.js";
 import { env } from "./config/env.js";
-import { logger } from "./utils/logger.js";
+import { logger } from "./config/logger.js";
 
 const startServer = async (): Promise<void> => {
   await connectDB();
