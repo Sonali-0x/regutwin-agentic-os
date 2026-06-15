@@ -1,4 +1,4 @@
-from schemas import RegulationAnalysis
+from .schemas import RegulationAnalysis
 
 def build_analysis(
     title,
