@@ -1,39 +1,14 @@
-import { Request, Response } from 'express';
-import { authService } from '../services/auth.service';
-import { userRepository } from '../database/repositories/UserRepository';
+import { Request, Response } from "express";
+import { AuthService } from "../services/auth.service.js";
 
-export class AuthController {
-  async register(req: Request, res: Response) {
-    try {
-      const { username, email, password, role, department } = req.body;
+export const register = async (req: Request, res: Response) => {
+  const user = await AuthService.register(req.body);
 
-      const existingUser = await userRepository.findByEmail(email);
-      if (existingUser) return res.status(400).json({ message: 'User already exists' });
+  res.status(201).json(user);
+};
 
-      const passwordHash = await authService.hashPassword(password);
-      const user = await userRepository.create({
-        username,
-        email,
-        passwordHash,
-        role,
-        department
-      });
+export const login = async (req: Request, res: Response) => {
+  const result = await AuthService.login(req.body.email, req.body.password);
 
-      res.status(201).json({ message: 'User registered successfully', userId: user._id });
-    } catch (error: any) {
-      res.status(500).json({ message: error.message });
-    }
-  }
-
-  async login(req: Request, res: Response) {
-    try {
-      const { email, password } = req.body;
-      const { user, token } = await authService.authenticate(email, password);
-      res.json({ token, user });
-    } catch (error: any) {
-      res.status(401).json({ message: error.message });
-    }
-  }
-}
-
-export const authController = new AuthController();
+  res.status(200).json(result);
+};

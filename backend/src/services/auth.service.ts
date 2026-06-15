@@ -1,40 +1,57 @@
-import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { userRepository } from '../database/repositories/UserRepository';
-import { IUser } from '../database/models/User';
+import User from "../models/user.model.js";
+import RefreshToken from "../models/refreshToken.model.js";
 
-const JWT_SECRET = process.env.JWT_SECRET || 'super-secret-key';
-const TOKEN_EXPIRY = '24h';
+import { hashPassword, comparePassword } from "../utils/password.js";
+
+import { generateAccessToken, generateRefreshToken } from "../utils/jwt.js";
 
 export class AuthService {
-  async hashPassword(password: string): Promise<string> {
-    const salt = await bcrypt.genSalt(10);
-    return bcrypt.hash(password, salt);
+  static async register(data: any) {
+    const existing = await User.findOne({
+      email: data.email,
+    });
+
+    if (existing) throw new Error("User already exists");
+
+    const hashed = await hashPassword(data.password);
+
+    const user = await User.create({
+      ...data,
+      password: hashed,
+    });
+
+    return user;
   }
 
-  async comparePassword(password: string, hash: string): Promise<boolean> {
-    return bcrypt.compare(password, hash);
-  }
+  static async login(email: string, password: string) {
+    const user = await User.findOne({
+      email,
+    });
 
-  async generateToken(user: IUser): Promise<string> {
+    if (!user) throw new Error("Invalid credentials");
+
+    const valid = await comparePassword(password, user.password);
+
+    if (!valid) throw new Error("Invalid credentials");
+
     const payload = {
       id: user._id,
-      email: user.email,
-      role: user.role
+      role: user.role,
     };
-    return jwt.sign(payload, JWT_SECRET, { expiresIn: TOKEN_EXPIRY });
-  }
 
-  async authenticate(email: string, pass: string) {
-    const user = await userRepository.findByEmail(email);
-    if (!user) throw new Error('Invalid credentials');
+    const accessToken = generateAccessToken(payload);
 
-    const isMatch = await this.comparePassword(pass, user.passwordHash);
-    if (!isMatch) throw new Error('Invalid credentials');
+    const refreshToken = generateRefreshToken(payload);
 
-    const token = await this.generateToken(user);
-    return { user, token };
+    await RefreshToken.create({
+      userId: user._id,
+      token: refreshToken,
+    });
+
+    return {
+      user,
+      accessToken,
+      refreshToken,
+    };
   }
 }
-
-export const authService = new AuthService();
