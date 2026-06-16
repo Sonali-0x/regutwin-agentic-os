@@ -1,27 +1,24 @@
-from .obligation_extractor import extract_obligations
-from .deadline_extractor import extract_deadlines
-from .impact_analyzer import analyze_impact
-from .risk_analyzer import calculate_risk
-from .regulation_summarizer import summarize
-from .output_formatter import build_analysis
+import json
 
-def analyze_regulation(text):
+from json_repair import repair_json
 
-    obligations = extract_obligations(text)
+from llm.ollama_client import OllamaClient
+from .prompts import ANALYST_PROMPT
 
-    deadlines = extract_deadlines(text)
+class AnalystAgent:
 
-    impact = analyze_impact(text)
+    @staticmethod
+    def analyze(text: str):
 
-    risk = calculate_risk(obligations)
+        prompt = f"""
+        {ANALYST_PROMPT}
 
-    summary = summarize(text)
+        Regulation:
+        {text}
+        """
 
-    return build_analysis(
-        title="Generated Title",
-        summary=summary,
-        obligations=obligations,
-        deadlines=deadlines,
-        impact=impact,
-        risk=risk
-    )
+        response = OllamaClient.analyze(prompt)
+
+        fixed = repair_json(response)
+
+        return json.loads(fixed)

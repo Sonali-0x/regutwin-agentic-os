@@ -1,13 +1,13 @@
-from llm.qwen_client import ask_llm
+# from llm.qwen_client import ask_llm
 
-def summarize(text):
+# def summarize(text):
 
-    prompt = f"""
-    Summarize this regulation.
+#     prompt = f"""
+#     Summarize this regulation.
 
-    Maximum 100 words.
+#     Maximum 100 words.
 
-    {text}
-    """
+#     {text}
+#     """
 
-    return ask_llm(prompt)
+#     return ask_llm(prompt)

@@ -1,17 +1,17 @@
-from llm.qwen_client import ask_llm
+# from llm.qwen_client import ask_llm
 
-def analyze_impact(text: str):
+# def analyze_impact(text: str):
 
-    prompt = f"""
-    Identify:
+#     prompt = f"""
+#     Identify:
 
-    - Departments
-    - Systems
-    - Applications
+#     - Departments
+#     - Systems
+#     - Applications
 
-    Return JSON.
+#     Return JSON.
 
-    {text}
-    """
+#     {text}
+#     """
 
-    return ask_llm(prompt)
+#     return ask_llm(prompt)

@@ -1,20 +1,17 @@
 from pydantic import BaseModel
 from typing import List
+from enum import Enum
 
-class Deadline(BaseModel):
-    description: str
-    date: str
+class RiskLevel(str, Enum):
+    LOW = "LOW"
+    MEDIUM = "MEDIUM"
+    HIGH = "HIGH"
+    CRITICAL = "CRITICAL"
 
-class RegulationAnalysis(BaseModel):
-    title: str
-    summary: str
 
+class AnalysisResult(BaseModel):
     obligations: List[str]
-
-    deadlines: List[Deadline]
-
-    affected_departments: List[str]
-
-    affected_systems: List[str]
-
-    risk_level: str
+    deadlines: List[str]
+    affectedSystems: List[str]
+    policyChanges: List[str]
+    riskLevel: RiskLevel
