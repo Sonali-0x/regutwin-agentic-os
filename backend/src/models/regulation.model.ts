@@ -42,6 +42,18 @@ const RegulationSchema = new Schema<IRegulation>(
       type: Date,
     },
 
+    analysis: {
+      obligations: [String],
+      deadlines: [String],
+      affectedSystems: [String],
+      policyChanges: [String],
+
+      riskLevel: {
+        type: String,
+        enum: ["LOW", "MEDIUM", "HIGH", "CRITICAL"],
+      },
+    },
+
     status: {
       type: String,
       enum: Object.values(RegulationStatus),
