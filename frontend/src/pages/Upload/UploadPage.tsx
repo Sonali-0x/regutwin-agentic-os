@@ -55,35 +55,50 @@ export default function UploadPage() {
   const [isDragOver, setIsDragOver] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const simulateUpload = useCallback((fileId: string, startProgress: number = 0) => {
+  const uploadFile = useCallback(async (fileObj: UploadedFile) => {
     setFiles((prev) =>
-      prev.map((f) => (f.id === fileId ? { ...f, status: 'uploading' as UploadStatus, progress: startProgress } : f))
+      prev.map((f) => (f.id === fileObj.id ? { ...f, status: 'uploading' as UploadStatus, progress: 10 } : f))
     );
-    let progress = startProgress;
-    const interval = setInterval(() => {
-      progress += Math.random() * 5 + 3;
-      if (progress >= 100) {
-        progress = 100;
-        clearInterval(interval);
-        setFiles((prev) =>
-          prev.map((f) => f.id === fileId ? { ...f, status: 'success' as UploadStatus, progress: 100 } : f)
-        );
-      } else {
-        setFiles((prev) =>
-          prev.map((f) => (f.id === fileId ? { ...f, progress: Math.min(progress, 99) } : f))
-        );
-      }
-    }, 450);
-  }, []);
 
-  // Run progress simulation on mount for any initial files in uploading state
-  useEffect(() => {
-    INITIAL_FILES.forEach((file) => {
-      if (file.status === 'uploading') {
-        simulateUpload(file.id, file.progress);
-      }
-    });
-  }, [simulateUpload]);
+    try {
+      const formData = new FormData();
+      formData.append('pdf', fileObj.file);
+      formData.append('title', fileObj.file.name);
+      formData.append('source', 'Manual Upload');
+
+      // Import api dynamically or add to top
+      const { default: api } = await import('../../services/api');
+
+      const response = await api.post('/regulations/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          // Note: Add auth token here if authentication is enabled
+        },
+        onUploadProgress: (progressEvent) => {
+          if (progressEvent.total) {
+            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            // Cap at 90% while AI analysis runs
+            setFiles((prev) =>
+              prev.map((f) => (f.id === fileObj.id ? { ...f, progress: Math.min(percentCompleted, 90) } : f))
+            );
+          }
+        },
+      });
+
+      // Upload and analysis complete
+      setFiles((prev) =>
+        prev.map((f) => f.id === fileObj.id ? { ...f, status: 'success' as UploadStatus, progress: 100 } : f)
+      );
+
+      // Optionally, redirect to the regulation details page:
+      // window.location.href = `/regulations/${response.data._id}`;
+
+    } catch (error: any) {
+      setFiles((prev) =>
+        prev.map((f) => (f.id === fileObj.id ? { ...f, status: 'error' as UploadStatus, error: error.message || 'Upload failed' } : f))
+      );
+    }
+  }, []);
 
   const addFiles = useCallback((newFiles: FileList | File[]) => {
     const fileArray = Array.from(newFiles);
@@ -111,8 +126,8 @@ export default function UploadPage() {
     }
 
     setFiles((prev) => [...prev, ...validFiles]);
-    validFiles.filter((f) => f.status === 'idle').forEach((f) => simulateUpload(f.id, 0));
-  }, [simulateUpload]);
+    validFiles.filter((f) => f.status === 'idle').forEach((f) => uploadFile(f));
+  }, [uploadFile]);
 
   const removeFile = (fileId: string) => {
     setFiles((prev) => prev.filter((f) => f.id !== fileId));

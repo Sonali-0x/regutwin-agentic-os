@@ -13,15 +13,27 @@ export const uploadRegulation = async (req: Request, res: Response) => {
 
   const extractedText = await PDFService.extractText(req.file.path);
 
-  const regulation = await Regulation.create({
+  // 1. Create the regulation as NEW
+  let regulation = await Regulation.create({
     title: req.body.title,
-
     source: req.body.source,
-
     filePath: req.file.path,
-
     extractedText,
   });
+
+  try {
+    // 2. Analyze the regulation via AI Layer
+    const { AIService } = await import("../services/ai.service.js");
+    const analysisResult = await AIService.analyze(regulation.id, extractedText);
+    
+    // 3. Update the regulation with analysis and set status to ANALYZED
+    regulation.analysis = analysisResult;
+    regulation.status = "ANALYZED" as any;
+    await regulation.save();
+  } catch (error) {
+    console.error("AI Analysis failed", error);
+    // Keep status as NEW if AI fails
+  }
 
   res.status(201).json(regulation);
 };
