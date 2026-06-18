@@ -11,3 +11,5 @@ beautifulsoup4
 pdfplumber
 langchain
 langchain-ollama
+chromadb
+langgraph
