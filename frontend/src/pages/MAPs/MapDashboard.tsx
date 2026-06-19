@@ -17,9 +17,42 @@ interface MAP {
   };
 }
 
+const STATUS_CONFIG: Record<string, { color: string; bg: string; label: string }> = {
+  OPEN:        { color: '#ef4444', bg: 'rgba(239,68,68,0.1)',   label: 'Open' },
+  IN_PROGRESS: { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)',  label: 'In Progress' },
+  IN_REVIEW:   { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)',  label: 'In Review' },
+  CLOSED:      { color: '#10b981', bg: 'rgba(16,185,129,0.1)',  label: 'Closed' },
+};
+
+function Toast({ message, type, onClose }: { message: string; type: 'success' | 'error'; onClose: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onClose, 5000);
+    return () => clearTimeout(t);
+  }, [onClose]);
+
+  return (
+    <div
+      className="fixed bottom-6 right-6 z-50 flex items-start gap-3 p-4 rounded-2xl shadow-2xl max-w-sm fade-in"
+      style={{
+        background: type === 'success' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+        border: `1px solid ${type === 'success' ? 'rgba(16,185,129,0.4)' : 'rgba(239,68,68,0.4)'}`,
+        backdropFilter: 'blur(20px)',
+      }}
+    >
+      <span className="text-xl mt-0.5">{type === 'success' ? '✅' : '❌'}</span>
+      <div className="flex-1">
+        <p className="text-sm font-semibold text-white">{type === 'success' ? 'Validation Passed' : 'Validation Failed'}</p>
+        <p className="text-xs mt-1 line-clamp-4" style={{ color: 'rgba(255,255,255,0.65)' }}>{message}</p>
+      </div>
+      <button onClick={onClose} className="text-white/40 hover:text-white/80 transition-colors text-sm mt-0.5">✕</button>
+    </div>
+  );
+}
+
 export default function MapDashboard() {
   const [maps, setMaps] = useState<MAP[]>([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
     const fetchMaps = async () => {
@@ -32,79 +65,151 @@ export default function MapDashboard() {
         setLoading(false);
       }
     };
-
     fetchMaps();
   }, []);
 
   const handleStatusChange = async (id: string, newStatus: string) => {
     try {
       await api.patch(`/maps/${id}/status`, { status: newStatus });
-      setMaps((prev) =>
-        prev.map((map) => (map._id === id ? { ...map, status: newStatus } : map))
-      );
+      setMaps((prev) => prev.map((map) => (map._id === id ? { ...map, status: newStatus } : map)));
     } catch (error) {
       console.error('Failed to update MAP status', error);
     }
   };
 
   if (loading) {
-    return <div className="page-center-wrapper"><p className="text-white">Loading MAPs...</p></div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+          <span className="text-white/60 text-sm">Loading MAPs...</span>
+        </div>
+      </div>
+    );
   }
 
+  const openCount = maps.filter(m => m.status === 'OPEN').length;
+  const closedCount = maps.filter(m => m.status === 'CLOSED').length;
+
   return (
-    <div className="max-w-6xl mx-auto py-10 px-6 fade-in">
-      <div className="flex items-center justify-between mb-8">
+    <div className="fade-in space-y-6">
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">MAP Dashboard</h1>
-          <p className="text-[var(--color-surface-300)]">Manage and track Measurable Action Points.</p>
+          <h1 className="text-2xl font-black text-white">MAP Dashboard</h1>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Measurable Action Points — Assigned & Tracked
+          </p>
+        </div>
+        <div className="flex items-center gap-3">
+          <div className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444', border: '1px solid rgba(239,68,68,0.2)' }}>
+            {openCount} Open
+          </div>
+          <div className="px-3 py-1.5 rounded-full text-xs font-bold" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}>
+            {closedCount} Closed
+          </div>
         </div>
       </div>
 
       {maps.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-2xl">
-          <p className="text-[var(--color-surface-300)]">No MAPs found. Extract MAPs from a regulation to see them here.</p>
+        <div
+          className="text-center py-20 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.1)' }}
+        >
+          <p className="text-5xl mb-4">📋</p>
+          <p className="text-white font-semibold mb-1">No MAPs generated yet</p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            Upload a regulatory document to automatically generate MAPs.
+          </p>
         </div>
       ) : (
-        <div className="grid gap-6">
-          {maps.map((map) => (
-            <div key={map._id} className="bg-white/5 border border-white/10 rounded-2xl p-6 transition-all hover:bg-white/10">
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h2 className="text-xl font-bold text-white">{map.actionRequired}</h2>
-                  <p className="text-sm text-[var(--color-surface-400)] mt-1">Regulation: {map.regulationId?.title || 'Unknown'}</p>
-                </div>
-                <div className="flex items-center space-x-4">
-                  <span className="px-3 py-1 rounded-full text-xs font-semibold bg-[var(--color-surface-100)] text-[var(--color-surface-400)] border border-white/10">
-                    {map.assignedTo}
-                  </span>
-                  <select
-                    value={map.status}
-                    onChange={(e) => handleStatusChange(map._id, e.target.value)}
-                    className="bg-black/50 border border-white/20 text-white text-sm rounded-lg focus:ring-[var(--color-primary)] focus:border-[var(--color-primary)] block p-2"
-                  >
-                    <option value="OPEN">OPEN</option>
-                    <option value="IN_PROGRESS">IN PROGRESS</option>
-                    <option value="IN_REVIEW">IN REVIEW</option>
-                    <option value="CLOSED">CLOSED</option>
-                  </select>
-                </div>
-              </div>
-
-              <p className="text-[var(--color-surface-300)] mb-6 text-sm">{map.description}</p>
-              
-              <ApiTestConfigurator 
-                mapId={map._id} 
-                initialEndpoint={map.targetApiEndpoint} 
-                initialConfig={map.testConfig}
-                onValidationComplete={(res) => {
-                  if (res.map) {
-                    setMaps(prev => prev.map(m => m._id === map._id ? { ...m, status: res.map.status } : m));
-                  }
-                  alert(`Validation complete! Status: ${res.validationResult?.is_valid ? 'PASSED' : 'FAILED'}\n${res.validationResult?.feedback}`);
+        <div className="grid gap-4">
+          {maps.map((map) => {
+            const sc = STATUS_CONFIG[map.status] || STATUS_CONFIG['OPEN'];
+            return (
+              <div
+                key={map._id}
+                className="rounded-2xl p-5 transition-all"
+                style={{
+                  background: 'rgba(255,255,255,0.04)',
+                  border: '1px solid rgba(255,255,255,0.07)',
                 }}
-              />
-            </div>
-          ))}
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1 min-w-0 mr-4">
+                    <h2 className="text-base font-bold text-white mb-1 leading-snug">{map.actionRequired}</h2>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span
+                        className="text-xs font-medium px-2 py-0.5 rounded-full"
+                        style={{ background: 'rgba(99,102,241,0.15)', color: '#818cf8', border: '1px solid rgba(99,102,241,0.3)' }}
+                      >
+                        📁 {map.regulationId?.title || 'Unknown Regulation'}
+                      </span>
+                      <span
+                        className="text-xs font-medium px-2 py-0.5 rounded-full"
+                        style={{ background: 'rgba(255,255,255,0.06)', color: 'rgba(255,255,255,0.6)', border: '1px solid rgba(255,255,255,0.1)' }}
+                      >
+                        🏢 {map.assignedTo}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span
+                      className="text-xs font-bold px-3 py-1 rounded-full"
+                      style={{ background: sc.bg, color: sc.color, border: `1px solid ${sc.color}33` }}
+                    >
+                      {sc.label}
+                    </span>
+                    <select
+                      value={map.status}
+                      onChange={(e) => handleStatusChange(map._id, e.target.value)}
+                      className="text-xs font-medium rounded-lg px-2 py-1.5 outline-none cursor-pointer"
+                      style={{
+                        background: 'rgba(255,255,255,0.05)',
+                        border: '1px solid rgba(255,255,255,0.1)',
+                        color: 'rgba(255,255,255,0.7)',
+                      }}
+                    >
+                      <option value="OPEN">OPEN</option>
+                      <option value="IN_PROGRESS">IN PROGRESS</option>
+                      <option value="IN_REVIEW">IN REVIEW</option>
+                      <option value="CLOSED">CLOSED</option>
+                    </select>
+                  </div>
+                </div>
+
+                {map.description && (
+                  <p className="text-sm mb-4 leading-relaxed" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                    {map.description}
+                  </p>
+                )}
+
+                <ApiTestConfigurator
+                  mapId={map._id}
+                  initialEndpoint={map.targetApiEndpoint}
+                  initialConfig={map.testConfig}
+                  onValidationComplete={(res) => {
+                    if (res.map) {
+                      setMaps(prev => prev.map(m => m._id === map._id ? { ...m, status: res.map.status } : m));
+                    }
+                    const passed = res.validationResult?.is_valid;
+                    setToast({
+                      type: passed ? 'success' : 'error',
+                      message: res.validationResult?.feedback || (passed ? 'Compliance verified.' : 'Validation failed.'),
+                    });
+                  }}
+                />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

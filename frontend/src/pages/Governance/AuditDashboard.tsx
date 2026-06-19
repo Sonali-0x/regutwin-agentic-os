@@ -8,25 +8,22 @@ interface Audit {
   newStatus?: string;
   evidenceText?: string;
   createdAt: string;
-  regulationId: {
-    title: string;
-    source: string;
-  };
-  mapId: {
-    actionRequired: string;
-    assignedTo: string;
-    description: string;
-  };
-  validationResult?: {
-    is_valid: boolean;
-    confidence: number;
-    feedback: string;
-  };
+  regulationId: { title: string; source: string };
+  mapId: { actionRequired: string; assignedTo: string; description: string };
+  validationResult?: { is_valid: boolean; confidence: number; feedback: string };
 }
+
+const ACTION_COLORS: Record<string, { color: string; bg: string; icon: string }> = {
+  CREATED:        { color: '#818cf8', bg: 'rgba(99,102,241,0.1)', icon: '➕' },
+  UPDATED:        { color: '#f59e0b', bg: 'rgba(245,158,11,0.1)', icon: '✏️' },
+  STATUS_CHANGED: { color: '#3b82f6', bg: 'rgba(59,130,246,0.1)', icon: '🔄' },
+  VALIDATED:      { color: '#10b981', bg: 'rgba(16,185,129,0.1)', icon: '🔬' },
+};
 
 export default function AuditDashboard() {
   const [audits, setAudits] = useState<Audit[]>([]);
   const [loading, setLoading] = useState(true);
+  const [filter, setFilter] = useState<string>('ALL');
 
   useEffect(() => {
     const fetchAudits = async () => {
@@ -39,71 +36,151 @@ export default function AuditDashboard() {
         setLoading(false);
       }
     };
-
     fetchAudits();
   }, []);
 
+  const filtered = filter === 'ALL' ? audits : audits.filter(a => a.action === filter);
+
   if (loading) {
-    return <div className="page-center-wrapper"><p className="text-white">Loading governance trails...</p></div>;
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="flex items-center gap-3">
+          <div className="w-5 h-5 rounded-full border-2 border-indigo-400 border-t-transparent animate-spin" />
+          <span className="text-white/60 text-sm">Loading audit trails...</span>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="max-w-6xl mx-auto py-10 px-6 fade-in">
-      <div className="flex items-center justify-between mb-8">
+    <div className="fade-in space-y-6">
+      {/* Header */}
+      <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-white mb-2">Governance & Audit Trail</h1>
-          <p className="text-[var(--color-surface-300)]">Monitor all compliance actions and automated AI validations.</p>
+          <h1 className="text-2xl font-black text-white">Governance & Audit Trail</h1>
+          <p className="text-sm mt-1" style={{ color: 'rgba(255,255,255,0.4)' }}>
+            Immutable compliance activity log — every AI decision recorded
+          </p>
+        </div>
+        <div
+          className="px-3 py-1.5 rounded-full text-xs font-bold"
+          style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981', border: '1px solid rgba(16,185,129,0.2)' }}
+        >
+          {audits.length} Records
         </div>
       </div>
 
-      {audits.length === 0 ? (
-        <div className="text-center py-20 bg-white/5 border border-white/10 rounded-2xl">
-          <p className="text-[var(--color-surface-300)]">No audit trails found yet.</p>
+      {/* Filter pills */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {['ALL', 'CREATED', 'STATUS_CHANGED', 'VALIDATED', 'UPDATED'].map(f => (
+          <button
+            key={f}
+            onClick={() => setFilter(f)}
+            className="text-xs font-semibold px-3 py-1.5 rounded-full transition-all"
+            style={{
+              background: filter === f ? 'rgba(99,102,241,0.2)' : 'rgba(255,255,255,0.05)',
+              color: filter === f ? '#818cf8' : 'rgba(255,255,255,0.45)',
+              border: filter === f ? '1px solid rgba(99,102,241,0.4)' : '1px solid rgba(255,255,255,0.08)',
+            }}
+          >
+            {f.replace('_', ' ')}
+          </button>
+        ))}
+      </div>
+
+      {filtered.length === 0 ? (
+        <div
+          className="text-center py-20 rounded-2xl"
+          style={{ background: 'rgba(255,255,255,0.03)', border: '1px dashed rgba(255,255,255,0.1)' }}
+        >
+          <p className="text-5xl mb-4">🛡️</p>
+          <p className="text-white font-semibold mb-1">No audit records</p>
+          <p className="text-sm" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            Compliance events will appear here as the system processes regulations.
+          </p>
         </div>
       ) : (
-        <div className="space-y-4">
-          {audits.map((audit) => (
-            <div key={audit._id} className="bg-white/5 border border-white/10 rounded-xl p-5">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-mono text-[var(--color-surface-400)]">
-                  {new Date(audit.createdAt).toLocaleString()}
-                </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold tracking-wider bg-white/10 text-white uppercase">
-                  {audit.action}
-                </span>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <p className="text-sm text-[var(--color-surface-400)]">Regulation</p>
-                  <p className="text-white font-medium">{audit.regulationId?.title || 'Unknown'}</p>
+        <div className="space-y-3">
+          {filtered.map((audit) => {
+            const ac = ACTION_COLORS[audit.action] || { color: '#6366f1', bg: 'rgba(99,102,241,0.1)', icon: '📋' };
+            return (
+              <div
+                key={audit._id}
+                className="rounded-2xl p-5"
+                style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="text-xs font-bold px-2.5 py-1 rounded-full flex items-center gap-1.5"
+                      style={{ background: ac.bg, color: ac.color, border: `1px solid ${ac.color}30` }}
+                    >
+                      {ac.icon} {audit.action.replace('_', ' ')}
+                    </span>
+                  </div>
+                  <span className="text-xs font-mono" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                    {new Date(audit.createdAt).toLocaleString()}
+                  </span>
                 </div>
-                <div>
-                  <p className="text-sm text-[var(--color-surface-400)]">MAP Task</p>
-                  <p className="text-white font-medium">{audit.mapId?.actionRequired || 'Unknown'}</p>
-                </div>
-              </div>
 
-              {(audit.previousStatus || audit.newStatus) && (
-                <div className="mt-4 pt-4 border-t border-white/10">
-                  <p className="text-sm">
-                    <span className="text-[var(--color-surface-400)]">Status changed: </span>
-                    <span className="text-red-400 line-through mr-2">{audit.previousStatus}</span>
-                    <span className="text-green-400 font-bold">{audit.newStatus}</span>
-                  </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+                  <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.3)' }}>Regulation</p>
+                    <p className="text-sm font-medium text-white">{audit.regulationId?.title || 'Unknown'}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{audit.regulationId?.source}</p>
+                  </div>
+                  <div className="p-3 rounded-xl" style={{ background: 'rgba(255,255,255,0.03)' }}>
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: 'rgba(255,255,255,0.3)' }}>MAP Task</p>
+                    <p className="text-sm font-medium text-white">{audit.mapId?.actionRequired || 'Unknown'}</p>
+                    <p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.4)' }}>{audit.mapId?.assignedTo}</p>
+                  </div>
                 </div>
-              )}
 
-              {audit.validationResult && (
-                <div className={`mt-4 p-4 rounded-lg border ${audit.validationResult.is_valid ? 'bg-green-500/10 border-green-500/30' : 'bg-red-500/10 border-red-500/30'}`}>
-                  <h4 className={`text-sm font-bold mb-1 ${audit.validationResult.is_valid ? 'text-green-400' : 'text-red-400'}`}>
-                    AI Validation {audit.validationResult.is_valid ? 'PASSED' : 'FAILED'} (Confidence: {audit.validationResult.confidence}%)
-                  </h4>
-                  <p className="text-sm text-white/80">{audit.validationResult.feedback}</p>
-                </div>
-              )}
-            </div>
-          ))}
+                {(audit.previousStatus || audit.newStatus) && (
+                  <div className="flex items-center gap-2 text-sm mb-3">
+                    <span className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>Status:</span>
+                    {audit.previousStatus && (
+                      <span className="px-2 py-0.5 rounded text-xs font-semibold line-through" style={{ background: 'rgba(239,68,68,0.1)', color: '#ef4444' }}>
+                        {audit.previousStatus}
+                      </span>
+                    )}
+                    {audit.previousStatus && audit.newStatus && (
+                      <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.3)" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                    {audit.newStatus && (
+                      <span className="px-2 py-0.5 rounded text-xs font-semibold" style={{ background: 'rgba(16,185,129,0.1)', color: '#10b981' }}>
+                        {audit.newStatus}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {audit.validationResult && (
+                  <div
+                    className="p-4 rounded-xl"
+                    style={{
+                      background: audit.validationResult.is_valid ? 'rgba(16,185,129,0.08)' : 'rgba(239,68,68,0.08)',
+                      border: `1px solid ${audit.validationResult.is_valid ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}`,
+                    }}
+                  >
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="text-xs font-bold" style={{ color: audit.validationResult.is_valid ? '#10b981' : '#ef4444' }}>
+                        🔬 AI Validation {audit.validationResult.is_valid ? 'PASSED' : 'FAILED'}
+                      </h4>
+                      <span className="text-xs font-semibold" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                        Confidence: {audit.validationResult.confidence}%
+                      </span>
+                    </div>
+                    <p className="text-sm leading-relaxed" style={{ color: 'rgba(255,255,255,0.7)' }}>
+                      {audit.validationResult.feedback}
+                    </p>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

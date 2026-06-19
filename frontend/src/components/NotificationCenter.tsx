@@ -15,68 +15,97 @@ export default function NotificationCenter() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    const socket = io('http://localhost:8000');
-    
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000');
     socket.on('new_alert', (alert: Alert) => {
-      setAlerts(prev => [alert, ...prev]);
+      setAlerts(prev => [{ ...alert, read: false }, ...prev]);
     });
-
-    return () => {
-      socket.disconnect();
-    };
+    return () => { socket.disconnect(); };
   }, []);
 
   const unreadCount = alerts.filter(a => !a.read).length;
-
-  const markAllRead = () => {
-    setAlerts(prev => prev.map(a => ({ ...a, read: true })));
-  };
+  const markAllRead = () => setAlerts(prev => prev.map(a => ({ ...a, read: true })));
 
   return (
     <div className="relative">
-      <button 
+      <button
         onClick={() => setIsOpen(!isOpen)}
-        className="relative p-2 text-white hover:bg-white/10 rounded-full transition-colors"
+        className="relative p-2 rounded-xl transition-colors"
+        style={{ background: isOpen ? 'rgba(99,102,241,0.15)' : 'rgba(255,255,255,0.05)' }}
+        title="Notifications"
       >
-        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        <svg width="18" height="18" fill="none" viewBox="0 0 24 24" stroke="rgba(255,255,255,0.6)" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
         </svg>
         {unreadCount > 0 && (
-          <span className="absolute top-0 right-0 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white transform translate-x-1/4 -translate-y-1/4 bg-red-600 rounded-full">
-            {unreadCount}
+          <span
+            className="absolute -top-1 -right-1 w-4 h-4 rounded-full flex items-center justify-center text-[9px] font-black text-white"
+            style={{ background: '#ef4444' }}
+          >
+            {unreadCount > 9 ? '9+' : unreadCount}
           </span>
         )}
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-black/90 border border-white/20 rounded-xl shadow-2xl overflow-hidden z-50 backdrop-blur-xl">
-          <div className="p-4 border-b border-white/10 flex justify-between items-center">
-            <h3 className="text-white font-bold">Notifications</h3>
-            {unreadCount > 0 && (
-              <button onClick={markAllRead} className="text-xs text-[var(--color-primary)] hover:underline">
-                Mark all read
-              </button>
-            )}
-          </div>
-          <div className="max-h-96 overflow-y-auto">
-            {alerts.length === 0 ? (
-              <div className="p-4 text-center text-sm text-[var(--color-surface-400)]">
-                No new alerts.
-              </div>
-            ) : (
-              alerts.map(alert => (
-                <div key={alert.id} className={`p-4 border-b border-white/10 hover:bg-white/5 transition-colors ${!alert.read ? 'bg-red-500/10' : ''}`}>
-                  <div className="flex justify-between items-start mb-1">
-                    <span className="text-xs font-bold text-red-400">{alert.department}</span>
-                    <span className="text-xs text-[var(--color-surface-400)]">{new Date(alert.timestamp).toLocaleTimeString()}</span>
-                  </div>
-                  <h4 className="text-sm font-bold text-white mb-1">{alert.subject}</h4>
-                  <p className="text-xs text-[var(--color-surface-300)] line-clamp-3">{alert.message}</p>
+        <>
+          {/* backdrop */}
+          <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+          <div
+            className="absolute right-0 mt-2 w-80 rounded-2xl shadow-2xl overflow-hidden z-50"
+            style={{
+              background: 'rgba(15,15,26,0.97)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              backdropFilter: 'blur(20px)',
+              top: '100%',
+            }}
+          >
+            <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: 'rgba(255,255,255,0.08)' }}>
+              <p className="text-sm font-bold text-white">Alerts</p>
+              {unreadCount > 0 && (
+                <button
+                  onClick={markAllRead}
+                  className="text-xs font-semibold transition-colors"
+                  style={{ color: '#818cf8' }}
+                >
+                  Mark all read
+                </button>
+              )}
+            </div>
+
+            <div className="max-h-80 overflow-y-auto">
+              {alerts.length === 0 ? (
+                <div className="py-8 text-center">
+                  <p className="text-2xl mb-2">🔔</p>
+                  <p className="text-xs" style={{ color: 'rgba(255,255,255,0.4)' }}>No alerts yet</p>
                 </div>
-              ))
-            )}
+              ) : (
+                alerts.map(alert => (
+                  <div
+                    key={alert.id}
+                    className="px-4 py-3 border-b transition-colors"
+                    style={{
+                      borderColor: 'rgba(255,255,255,0.05)',
+                      background: !alert.read ? 'rgba(239,68,68,0.05)' : 'transparent',
+                    }}
+                  >
+                    <div className="flex items-start justify-between mb-1">
+                      <span className="text-[10px] font-bold uppercase tracking-wide" style={{ color: '#ef4444' }}>
+                        {alert.department}
+                      </span>
+                      <span className="text-[10px]" style={{ color: 'rgba(255,255,255,0.3)' }}>
+                        {new Date(alert.timestamp).toLocaleTimeString()}
+                      </span>
+                    </div>
+                    <p className="text-xs font-semibold text-white mb-0.5">{alert.subject}</p>
+                    <p className="text-xs leading-relaxed line-clamp-3" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                      {alert.message}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );
