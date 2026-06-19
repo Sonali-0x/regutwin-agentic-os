@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
+from typing import Optional
 from agents.analyst import analyze_regulation
 from schemas.analysis import RegulationAnalysis
 from schemas.map import AssignedMAPList

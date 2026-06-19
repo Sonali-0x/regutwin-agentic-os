@@ -1,11 +1,8 @@
 import os
 import chromadb
 from chromadb.config import Settings
+from chromadb.utils import embedding_functions
 import uuid
-
-# We will use Ollama for embeddings
-from langchain_ollama import OllamaEmbeddings
-from core.llm import config as llm_config
 
 # Ensure we have a path for persistent storage
 DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_data")
@@ -13,26 +10,13 @@ DB_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "chroma_data"
 # Initialize ChromaDB client
 client = chromadb.PersistentClient(path=DB_PATH)
 
-# We use Langchain's OllamaEmbeddings as a wrapper, but Chroma expects an embedding function class
-# So we create a simple adapter
-class OllamaEmbeddingFunction(chromadb.EmbeddingFunction):
-    def __init__(self):
-        # We will use nomic-embed-text for embeddings as it's better, or just use the default model
-        # Let's use the default model from config for simplicity unless specified
-        self.embeddings = OllamaEmbeddings(
-            model=llm_config.model,
-            base_url=llm_config.base_url
-        )
-
-    def __call__(self, input: list[str]) -> list[list[float]]:
-        return self.embeddings.embed_documents(input)
-
-embedding_fn = OllamaEmbeddingFunction()
+# Use ChromaDB's default embedding function instead of Ollama's since Ollama server might not support embeddings
+default_ef = embedding_functions.DefaultEmbeddingFunction()
 
 # Get or create the collection for regulatory obligations
 obligations_collection = client.get_or_create_collection(
     name="obligations",
-    embedding_function=embedding_fn
+    embedding_function=default_ef
 )
 
 def store_obligations(regulation_id: str, title: str, source: str, obligations: list):
