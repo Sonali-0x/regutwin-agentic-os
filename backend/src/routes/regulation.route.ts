@@ -8,14 +8,10 @@ import {
 
 import { upload } from "../middleware/upload.middleware.js";
 
-import { authenticate } from "../middleware/auth.middleware.js";
-
 const router = Router();
 
-router.post("/upload", authenticate, upload.single("pdf"), uploadRegulation);
-
-router.get("/", authenticate, getRegulations);
-
-router.get("/:id", authenticate, getRegulation);
+router.post("/upload", upload.single("pdf"), uploadRegulation);
+router.get("/", getRegulations);
+router.get("/:id", getRegulation);
 
 export default router;

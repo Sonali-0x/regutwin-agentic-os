@@ -10,17 +10,14 @@ import {
   validateMap,
 } from "../controllers/map.controller.js";
 
-import { authenticate } from "../middleware/auth.middleware.js";
-
 const router = Router();
 
-// Define routes
-router.post("/", authenticate, createMap);
-router.get("/", authenticate, getMaps);
-router.get("/:id", authenticate, getMap);
-router.patch("/:id/status", authenticate, updateMapStatus);
-router.post("/:id/validate", authenticate, validateMap);
-router.put("/:id", authenticate, updateMap);
-router.delete("/:id", authenticate, deleteMap);
+router.post("/", createMap);
+router.get("/", getMaps);
+router.get("/:id", getMap);
+router.patch("/:id/status", updateMapStatus);
+router.post("/:id/validate", validateMap);
+router.put("/:id", updateMap);
+router.delete("/:id", deleteMap);
 
 export default router;
