@@ -65,7 +65,7 @@ export default function RegulationsPage() {
     fetchRegulations();
 
     // Setup Socket.IO connection
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:3000');
+    const socket = io(import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000');
     
     socket.on('workflow_update', (data: WorkflowUpdate) => {
       setUpdates(prev => {
