@@ -36,12 +36,20 @@ export class AIService {
     return response.data;
   }
 
-  static async validateMap(actionRequired: string, description: string, evidenceText: string) {
+  static async validateMap(
+    actionRequired: string, 
+    description: string, 
+    evidenceText: string, 
+    targetApiEndpoint?: string, 
+    testConfig?: any
+  ) {
     const aiUrl = process.env.AI_SERVICE_URL || "http://localhost:8001";
     const response = await axios.post(`${aiUrl}/validate-map`, {
       action_required: actionRequired,
       description,
       evidence_text: evidenceText,
+      target_api_endpoint: targetApiEndpoint,
+      test_config: testConfig
     });
 
     return response.data;

@@ -86,7 +86,9 @@ from agents.validator.validator_agent import validate_map, ValidationResult
 class ValidationRequest(BaseModel):
     action_required: str
     description: str
-    evidence_text: str
+    evidence_text: Optional[str] = ""
+    target_api_endpoint: Optional[str] = None
+    test_config: Optional[dict] = None
 
 @app.post("/validate-map", response_model=ValidationResult)
 async def validate_map_endpoint(request: ValidationRequest):
@@ -94,7 +96,9 @@ async def validate_map_endpoint(request: ValidationRequest):
         result = validate_map(
             action_required=request.action_required,
             description=request.description,
-            evidence_text=request.evidence_text
+            evidence_text=request.evidence_text,
+            target_api_endpoint=request.target_api_endpoint,
+            test_config=request.test_config
         )
         return result
     except Exception as e:

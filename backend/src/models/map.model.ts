@@ -19,9 +19,16 @@ export interface IMap extends Document {
   regulationId: mongoose.Types.ObjectId;
   description: string;
   assignedTo: string;
+  actionRequired: string;
   status: MapStatus;
   deadline?: Date;
-  actionRequired: string;
+  targetApiEndpoint?: string;
+  testConfig?: {
+    method: string;
+    payload?: string;
+    expectedStatus?: number;
+    expectedResponseSubstring?: string;
+  };
 }
 
 const MapSchema = new Schema<IMap>(
@@ -51,6 +58,13 @@ const MapSchema = new Schema<IMap>(
     actionRequired: {
       type: String,
       required: true,
+    },
+    targetApiEndpoint: String,
+    testConfig: {
+      method: String,
+      payload: String,
+      expectedStatus: Number,
+      expectedResponseSubstring: String,
     },
   },
   {

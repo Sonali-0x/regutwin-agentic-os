@@ -113,12 +113,30 @@ export const validateMap = async (req: Request, res: Response) => {
       return res.status(404).json({ error: "MAP not found" });
     }
 
-    const validationResult = await AIService.validateMap(map.actionRequired, map.description, evidenceText);
+    const validationResult = await AIService.validateMap(
+      map.actionRequired, 
+      map.description, 
+      evidenceText,
+      map.targetApiEndpoint,
+      map.testConfig
+    );
     
     const previousStatus = map.status;
     if (validationResult.is_valid) {
       map.status = "CLOSED" as any;
       await map.save();
+    } else {
+      map.status = "OPEN" as any; // Reopen the ticket
+      await map.save();
+      
+      // Phase 7: Alert managers
+      import("../services/notification.service.js").then(({ NotificationService }) => {
+        NotificationService.sendAlert(
+          map.assignedTo,
+          "URGENT: MAP Validation Failed",
+          `The MAP "${map.actionRequired}" failed autonomous compliance testing.\nFeedback: ${validationResult.feedback}`
+        );
+      });
     }
 
     await Audit.create({

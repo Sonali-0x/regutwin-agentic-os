@@ -1,4 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import NotificationCenter from '../components/NotificationCenter';
 
 /* ============================================
    DashboardLayout — Light theme sidebar
@@ -52,16 +53,21 @@ export default function DashboardLayout() {
         </nav>
 
         {/* User */}
-        <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f3f4f6' }}>
-          <div
-            className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
-            style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)' }}
-          >
-            U
+        <div className="mt-auto">
+          <div className="flex items-center justify-center mb-4">
+            <NotificationCenter />
           </div>
-          <div className="flex-1 min-w-0">
-            <p style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }} className="truncate">Test User</p>
-            <p style={{ fontSize: '11px', color: '#9ca3af' }} className="truncate">test@regutwin.com</p>
+          <div className="flex items-center gap-3 p-3 rounded-xl" style={{ background: '#f3f4f6' }}>
+            <div
+              className="w-8 h-8 rounded-full flex items-center justify-center text-white text-xs font-semibold"
+              style={{ background: 'linear-gradient(135deg, #8b5cf6, #6366f1)' }}
+            >
+              U
+            </div>
+            <div className="flex-1 min-w-0">
+              <p style={{ fontSize: '13px', fontWeight: 600, color: '#111827' }} className="truncate">Test User</p>
+              <p style={{ fontSize: '11px', color: '#9ca3af' }} className="truncate">test@regutwin.com</p>
+            </div>
           </div>
         </div>
       </aside>

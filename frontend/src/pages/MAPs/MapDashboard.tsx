@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import ApiTestConfigurator from '../../components/ApiTestConfigurator';
 
 interface MAP {
   _id: string;
@@ -7,6 +8,8 @@ interface MAP {
   assignedTo: string;
   status: string;
   actionRequired: string;
+  targetApiEndpoint?: string;
+  testConfig?: any;
   regulationId: {
     _id: string;
     title: string;
@@ -88,6 +91,18 @@ export default function MapDashboard() {
               </div>
 
               <p className="text-[var(--color-surface-300)] mb-6 text-sm">{map.description}</p>
+              
+              <ApiTestConfigurator 
+                mapId={map._id} 
+                initialEndpoint={map.targetApiEndpoint} 
+                initialConfig={map.testConfig}
+                onValidationComplete={(res) => {
+                  if (res.map) {
+                    setMaps(prev => prev.map(m => m._id === map._id ? { ...m, status: res.map.status } : m));
+                  }
+                  alert(`Validation complete! Status: ${res.validationResult?.is_valid ? 'PASSED' : 'FAILED'}\n${res.validationResult?.feedback}`);
+                }}
+              />
             </div>
           ))}
         </div>
