@@ -40,3 +40,29 @@ export const broadcastWorkflowUpdate = (regulationId: string, node: string, stat
     });
   }
 };
+
+/**
+ * Phase 9 — HITL: Broadcasts a human approval request to all connected
+ * frontend clients when a CRITICAL risk regulation needs sign-off before
+ * MAP generation can proceed.
+ */
+export const broadcastHITLRequest = (
+  regulationId: string,
+  threadId: string,
+  legalRisk: string,
+  recommendedAction: string,
+  rationale: string
+) => {
+  if (io) {
+    io.emit("hitl_request", {
+      id: Date.now().toString(),
+      regulationId,
+      threadId,
+      legalRisk,
+      recommendedAction,
+      rationale,
+      timestamp: new Date().toISOString(),
+      resolved: false,
+    });
+  }
+};

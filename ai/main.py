@@ -62,7 +62,7 @@ async def detect_conflicts_endpoint(request: ConflictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-from workflows.regulation_flow import run_regulation_flow
+from workflows.regulation_flow import run_regulation_flow, resume_regulation_flow, get_workflow_state
 
 @app.post("/run-workflow")
 async def run_workflow_endpoint(request: AnalysisRequest):
@@ -104,6 +104,53 @@ async def validate_map_endpoint(request: ValidationRequest):
         return result
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+# ── Phase 9: HITL Resume Endpoints ───────────────────────────────────────────
+
+class ResumeRequest(BaseModel):
+    regulation_id: str
+
+@app.post("/resume-workflow")
+async def resume_workflow_endpoint(request: ResumeRequest):
+    """
+    Resumes a CRITICAL risk regulation workflow that was paused at the
+    human-in-the-loop approval gate. Called from the backend after a
+    compliance manager approves the regulation for MAP generation.
+    """
+    try:
+        result = resume_regulation_flow(regulation_id=request.regulation_id)
+        return {
+            "status": "resumed",
+            "maps": result.get("maps"),
+            "legal_review": result.get("legal_review"),
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/workflow-state/{regulation_id}")
+async def get_workflow_state_endpoint(regulation_id: str):
+    """
+    Returns the current persisted LangGraph state for a given regulation.
+    Useful for the backend to check whether a workflow is paused or completed.
+    """
+    try:
+        state = get_workflow_state(regulation_id=regulation_id)
+        if state is None:
+            raise HTTPException(status_code=404, detail="No workflow state found for this regulation ID.")
+        return {
+            "regulation_id": regulation_id,
+            "awaiting_approval": state.get("awaiting_approval", False),
+            "risk_routing": state.get("risk_routing", "low_medium"),
+            "retry_count": state.get("retry_count", 0),
+            "has_maps": state.get("maps") is not None,
+            "has_legal_review": state.get("legal_review") is not None,
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 if __name__ == "__main__":
     import uvicorn

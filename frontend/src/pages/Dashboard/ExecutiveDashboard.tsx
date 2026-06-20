@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../../services/api';
+import HumanApprovalQueue from '../../components/HumanApprovalQueue';
 import { ResponsiveContainer, PieChart, Pie, Cell, Tooltip, Legend, AreaChart, Area, XAxis, YAxis, CartesianGrid } from 'recharts';
 
 interface HealthMetrics {
@@ -238,24 +239,34 @@ export default function ExecutiveDashboard() {
         </div>
       </div>
 
+      {/* Phase 9: Human-in-the-Loop Approval Queue */}
+      <HumanApprovalQueue />
+
       {/* Bottom: AI pipeline status */}
       <div
         className="rounded-2xl p-5"
         style={{ background: 'rgba(99,102,241,0.06)', border: '1px solid rgba(99,102,241,0.15)' }}
       >
         <h3 className="text-sm font-bold text-white mb-4">🤖 Agentic Pipeline Status</h3>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
           {[
             { label: 'Watchman Agent', status: 'Active', icon: '👁️' },
             { label: 'Analyst Agent', status: 'Active', icon: '🧠' },
             { label: 'Conflict Engine', status: 'Active', icon: '⚡' },
+            { label: 'Legal Reviewer', status: 'Active', icon: '⚖️' },
+            { label: 'Human Gate', status: 'Standby', icon: '🧑‍⚖️', standby: true },
             { label: 'Validator Agent', status: 'Active', icon: '🔬' },
           ].map((agent) => (
             <div key={agent.label} className="flex items-center gap-3">
               <span className="text-xl">{agent.icon}</span>
               <div>
                 <p className="text-xs font-semibold text-white">{agent.label}</p>
-                <p className="text-[10px] font-medium" style={{ color: '#10b981' }}>● {agent.status}</p>
+                <p
+                  className="text-[10px] font-medium"
+                  style={{ color: (agent as any).standby ? '#f59e0b' : '#10b981' }}
+                >
+                  ● {agent.status}
+                </p>
               </div>
             </div>
           ))}
